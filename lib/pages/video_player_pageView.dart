@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:myapp/widget/card_video_player.dart';
-import 'package:myapp/domain/domain_video_player.dart';
-import 'package:myapp/db/database.dart';
+import 'package:Tarsis/widget/card_video_player.dart';
+import 'package:Tarsis/domain/domain_video_player.dart';
+import 'package:Tarsis/db/database.dart';
 
 class PageViewScreen extends StatefulWidget {
   const PageViewScreen({

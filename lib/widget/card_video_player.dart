@@ -3,13 +3,13 @@ import 'dart:typed_data';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:myapp/domain/domain_video_player.dart';
-import 'package:myapp/domain/message_card_class.dart';
+import 'package:Tarsis/domain/domain_video_player.dart';
+import 'package:Tarsis/domain/message_card_class.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import 'package:screenshot/screenshot.dart';
 import "package:share_plus/share_plus.dart";
-import 'package:myapp/db/database.dart';
+import 'package:Tarsis/db/database.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart';
 
@@ -195,7 +195,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   return [
                                     PopupMenuItem<String>(
                                       value: 'compartilhar',
-                                      child: Text('Compartilhar'),
+                                      child: Text('compartilhar'),
                                     ),
                                     PopupMenuItem<String>(
                                       value: 'salvar',

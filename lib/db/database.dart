@@ -1,5 +1,5 @@
-import "package:myapp/domain/domain_video_player.dart";
-import "package:myapp/db/message_domain_video_player.dart";
+import "package:Tarsis/domain/domain_video_player.dart";
+import "package:Tarsis/db/message_domain_video_player.dart";
 import "package:flutter/material.dart";
 
 class Database {

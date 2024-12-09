@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/domain/message_card_class.dart';
+import 'package:Tarsis/domain/message_card_class.dart';
 
 class MessageCard {
   static List<MessageCardClass> messageCard = [

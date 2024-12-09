@@ -1,4 +1,4 @@
-name: myapp
+name: Tarsis
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -40,6 +40,9 @@ dependencies:
   share_plus: 
   flutter_emoji: 
   file_picker:
+  shared_preferences:
+  sqflite:
+  path:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
 

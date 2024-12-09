@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/pages/video_player_pageView.dart';
+import 'package:Tarsis/pages/video_player_pageView.dart';
 
 void main() {
   runApp(

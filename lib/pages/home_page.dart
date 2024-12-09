@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:myapp/pages/video_player_pageView.dart';
+import 'package:Tarsis/pages/video_player_pageView.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
