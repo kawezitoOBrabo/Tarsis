@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 class DBHelper {
   Future<Database> initDB() async {
     String path = await getDatabasesPath();
-    String dbPath = join(path, "mensagem.db");
+    String dbPath = join(path, "pagina.db");
 
     // Abre o banco de dados e cria a tabela caso não exista.
     Database database = await openDatabase(
@@ -19,8 +19,8 @@ class DBHelper {
   }
 
   Future<void> onCreate(Database db, int version) async {
-    // SQL para criar a tabela MENSAGEM
-    String sql = '''
+    // Criação da tabela MENSAGEM
+    await db.execute('''
       CREATE TABLE MENSAGEM (
         id INTEGER PRIMARY KEY,
         tela_id INTEGER,
@@ -30,23 +30,16 @@ class DBHelper {
         mensagem TEXT,
         views TEXT
       );
-    ''';
-    await db.execute(sql);
+    ''');
 
-    // Exemplo de inserção inicial de dados
-    sql = '''
+    // Inserção inicial na tabela MENSAGEM
+    await db.execute('''
       INSERT INTO MENSAGEM (
-        id, 
-        tela_id,
-        imagem, 
-        nomePerfil, 
-        tempoMensagem, 
-        mensagem, 
-        views
+        id, tela_id, imagem, nomePerfil, tempoMensagem, mensagem, views
       ) VALUES 
-        (1, 1, 'https://images.pexels.com/users/avatars/1437723/cottonbro-studio-531.jpeg?auto=compress&fit=crop&h=40&w=40&dpr=1', 'CottonBro', '10 sem', 'Adorei a explicação, muito clara e objetiva', '3400'),
+        (1, 1, 'https://images.pexels.com/users/avatars/1437723/cottonbro-studio-531.jpeg', 'CottonBro', '10 sem', 'Adorei a explicação, muito clara e objetiva', '3400'),
         (2, 1, 'https://images.pexels.com/users/avatars/12345/alex-40.jpeg', 'Alex', '5 min', 'Muito interessante, parabéns!', '1500'),
-        (3, 1, 'https://images.pexels.com/users/avatars/6789/emma-40.jpeg', 'Emma', '20 min', 'Gostei do ponto abordado, excelente.', '1200'),
+        (3, 1, 'https://images.pexels.com/users/avatars/6789/emma-40.jpeg', 'Emma', '20 min', 'Gostei do ponto abordado, excelente.', '1200')
         (4, 1, 'https://images.pexels.com/users/avatars/54321/john-40.jpeg', 'John', '1 hora', 'Conteúdo relevante e direto.', '3000'),
         (5, 1, 'https://images.pexels.com/users/avatars/9876/mary-40.jpeg', 'Mary', '2 horas', 'Muito esclarecedor, obrigada!', '2200'),
       
@@ -73,35 +66,32 @@ class DBHelper {
         (23, 5, 'https://images.pexels.com/users/avatars/7654/noah-40.jpeg', 'Noah', '1 dia', 'Incrível como tudo foi abordado.', '3700'),
         (24, 5, 'https://images.pexels.com/users/avatars/8765/vic-40.jpeg', 'Vic', '10 dias', 'Gostei da abordagem técnica.', '2500'),
         (25, 5, 'https://images.pexels.com/users/avatars/9876/sophia-40.jpeg', 'Sophia', '15 dias', 'Muito inspirador, obrigado!', '3600');
-    ''';
-    await db.execute(sql);
+    ''');
 
-    sql = '''
+    // Criação da tabela PAGINA
+    await db.execute('''
       CREATE TABLE PAGINA (
         id INTEGER PRIMARY KEY,
         video TEXT,
         perfilImagem TEXT,
         nomePerfil TEXT,
-        descricao TEXT, 
-        musica TEXT,
+        descricao TEXT,
+        musica TEXT
       );
-    ''';
+    ''');
 
-    sql = ''' 
+    // Inserção inicial na tabela PAGINA
+    await db.execute('''
       INSERT INTO PAGINA (
-        id,
-        pagina_id,
-        video,
-        perfilImagem,
-        nomePerfil,
-        descricao,
-        musica
-    ) VALUES
-      (1, 'https://example.com/video1.mp4', 'https://example.com/profile1.jpg', 'João Silva', 'Passeando pela praia ao pôr do sol.', 'Calm Waves - Ocean Sounds'),
-      (2, 'https://example.com/video2.mp4', 'https://example.com/profile2.jpg', 'Ana Clara', 'Aprendendo novas receitas deliciosas.', 'Kitchen Vibes - Smooth Jazz'),
-      (3, 'https://example.com/video3.mp4', 'https://example.com/profile3.jpg', 'Carlos Eduardo', 'Trilha nas montanhas com amigos.', 'Adventure Beats - Electro Pop'),
-      (4, 'https://example.com/video4.mp4', 'https://example.com/profile4.jpg', 'Maria Fernanda', 'Um dia no parque com a família.', 'Nature Harmony - Acoustic Guitar'),
-      (5, 'https://example.com/video5.mp4', 'https://example.com/profile5.jpg', 'Rafael Santos', 'Mostrando meu setup gamer atualizado.', 'Techno Waves - EDM Mix');
-    ''';
+        id, video, perfilImagem, nomePerfil, descricao, musica
+      ) VALUES
+        (1, 'https://videos.pexels.com/video-files/28699246/12454963_1440_2560_50fps.mp4', 'https://images.pexels.com/users/avatars/522575817/iddea-photo-898.jpeg?auto=compress&fit=crop&h=40&w=40&dpr=1', 'LeitoraAvida', 'Mulher lendo livro no campo durante o pôr do sol.', 'Sem música'),
+        (2, 'https://videos.pexels.com/video-files/10677320/10677320-uhd_1440_2732_25fps.mp4', 'https://images.pexels.com/users/avatars/1302114817/a-b-s-498.jpeg?auto=compress&fit=crop&h=40&w=40&dpr=1', 'GatiinhosFofos', 'Gato britânico de pelo curto relaxando dentro de casa.', 'Sem música'),
+        (3, 'https://videos.pexels.com/video-files/28663010/12445553_1080_1920_60fps.mp4', 'https://images.pexels.com/users/avatars/1437723/cottonbro-studio-531.jpeg?auto=compress&fit=crop&h=40&w=40&dpr=1', 'Carlos Eduardo', 'Trilha nas montanhas com amigos.', 'Adventure Beats - Electro Pop'),
+        (4, 'https://videos.pexels.com/video-files/4920770/4920770-uhd_1440_2732_25fps.mp4', 'https://images.pexels.com/users/avatars/1437723/cottonbro-studio-531.jpeg?auto=compress&fit=crop&h=40&w=40&dpr=1', 'Maria Fernanda', 'Um dia no parque com a família.', 'Nature Harmony - Acoustic Guitar'),
+        (5, 'https://videos.pexels.com/video-files/6395999/6395999-hd_1080_1920_25fps.mp4', 'https://images.pexels.com/users/avatars/2297095/pavel-danilyuk-690.jpeg?auto=compress&fit=crop&h=40&w=40&dpr=1', 'Rafael Santos', 'Mostrando meu setup gamer atualizado.', 'Techno Waves - EDM Mix');
+    ''');
+
+
   }
 }
