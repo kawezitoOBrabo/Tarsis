@@ -64,7 +64,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     final newNomeImagem = _nomeImagemSalva.text.trim();
     if (_nomeCaminhoImagemSalva.text.isNotEmpty) {
       final path =
-          join(_nomeCaminhoImagemSalva.text, "$newNomeImagem-$time.png");
+      join(_nomeCaminhoImagemSalva.text, "$newNomeImagem-$time.png");
 
       final file = File(path);
       await file.writeAsBytes(image);
@@ -86,8 +86,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
   }
 
-  Future<List<MessageCardClass>> _loadMessages() async {
-    return await MessageDao().listarMensagem(widget.telaIdAtual);
+  // Carregar as mensagens
+  Future<void> _loadMessages() async {
+    List<MessageCardClass> mensagens = await MessageDao().listarMensagem(widget.telaIdAtual);
+    setState(() {
+      // Atualizar a lista de mensagens e o estado dos favoritos
+      _messagesFuture = Future.value(mensagens);
+      _isFavorite = List.filled(mensagens.length, false);    });
   }
 
   void _sendMessage() async {
@@ -109,7 +114,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         // Limpa o campo de texto após o envio
         _messageController.clear();
 
-        // Atualiza a lista de mensagens após a inserção
+        // Aguarde o carregamento das mensagens de forma mais confiável
+        Future.delayed(Duration(milliseconds: 1500), () async {
+          await _loadMessages();
+        });
+
         setState(() {});
       } catch (e) {
         print("Erro ao inserir mensagem: $e");
@@ -122,7 +131,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     Share.share(mensagem, subject: 'Look what I made!');
   }
 
-  //Atera a visibilade do card
+  //Atera a visibilidade do card
   void _messageCardVisibility() {
     setState(() {
       _isCardVisible = !_isCardVisible;
@@ -139,7 +148,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         _controller.play();
         setState(() {});
       });
-    _messagesFuture = MessageDao().listarMensagem(widget.telaIdAtual);
+
+    _loadMessages();
   }
 
   @override
@@ -502,7 +512,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           Container(
                             height: MediaQuery.of(context).size.height / 2,
                             child: FutureBuilder<List<MessageCardClass>>(
-                              future: _loadMessages(),
+                              future: _messagesFuture,
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
