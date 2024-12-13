@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+
+
   google_fonts:
   url_launcher:
   http: 
@@ -39,7 +42,7 @@ dependencies:
   audioplayers: 
   share_plus: 
   flutter_emoji: 
-  file_picker:
+  file_picker: ^5.2.7
   shared_preferences:
   sqflite:
   path:

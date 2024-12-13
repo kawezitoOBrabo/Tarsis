@@ -1,21 +1,19 @@
-import 'package:flutter/material.dart';
-
 class MessageCardClass {
-  late int id;
+  int? id; // Altere para int? (nullable)
   late int tela_id;
   late String image;
   late String nome;
   late String tempoMensagem;
   late String mensagem;
-  late Icon icon;
   late int views;
 
   MessageCardClass({
+    this.id, // Agora o id pode ser passado ou ser nulo
+    required this.tela_id,
     required this.image,
     required this.nome,
     required this.tempoMensagem,
     required this.mensagem,
-    required this.icon,
     required this.views,
   });
 
@@ -23,9 +21,21 @@ class MessageCardClass {
     id = json['id'];
     tela_id = json['tela_id'];
     image = json['imagem'];
-    nome = json['nome_perfil'];
+    nome = json['nomePerfil'];
     tempoMensagem = json['tempoMensagem'];
     mensagem = json['mensagem'];
     views = json['views'];
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id, // O id agora pode ser nulo
+      'tela_id': tela_id,
+      'imagem': image,
+      'nomePerfil': nome,
+      'tempoMensagem': tempoMensagem,
+      'mensagem': mensagem,
+      'views': views,
+    };
   }
 }

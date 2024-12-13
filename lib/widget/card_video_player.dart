@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:async';
+import 'package:Tarsis/db/message_dao.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Tarsis/domain/domain_video_player.dart';
@@ -9,15 +10,17 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import 'package:screenshot/screenshot.dart';
 import "package:share_plus/share_plus.dart";
-import 'package:Tarsis/db/database.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final DomainVideoPlayer domain_videoPlayer;
+  final int telaIdAtual;
+
   const VideoPlayerScreen({
     super.key,
     required this.domain_videoPlayer,
+    required this.telaIdAtual,
   });
 
   @override
@@ -26,6 +29,8 @@ class VideoPlayerScreen extends StatefulWidget {
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   DomainVideoPlayer get domainVideoPlayer => widget.domain_videoPlayer;
+  late Future<List<MessageCardClass>> _messagesFuture;
+  List<bool> _isFavorite = [];
 
   late VideoPlayerController _controller;
   final controller = ScreenshotController();
@@ -41,10 +46,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Color _seguirBorderColor = Colors.white;
   Color _seguirTextColor = Colors.white;
 
-  List<bool> _isFavorite = List.filled(
-    Database.domainVideoPlayer.length,
-    false,
-  );
   Color _messageIconColor = Colors.grey;
 
   bool _isCardVisible = false;
@@ -85,26 +86,34 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
   }
 
-  //Envia a mensagem sobre o vídeo
-  void _sendMessage() {
+  Future<List<MessageCardClass>> _loadMessages() async {
+    return await MessageDao().listarMensagem(widget.telaIdAtual);
+  }
+
+  void _sendMessage() async {
     if (_messageController.text.isNotEmpty) {
+      // Crie a nova mensagem
       MessageCardClass novaMensagem = MessageCardClass(
-        image:
-            "https://images.pexels.com/users/avatars/1437723/cottonbro-studio-531.jpeg?auto=compress&fit=crop&h=40&w=40&dpr=1",
-        nome: "KaweSouzaFirmino",
-        tempoMensagem: "Atual",
-        mensagem: _messageController.text.trim(),
-        icon: Icon(
-          Icons.favorite_border_outlined,
-          color: Colors.grey,
-        ),
+        tela_id: widget.telaIdAtual,
+        image: 'https://images.pexels.com/users/avatars/1437723/cottonbro-studio-531.jpeg',
+        nome: 'Usuário',
+        tempoMensagem: 'Agora',
+        mensagem: _messageController.text,
         views: 0,
       );
-      setState(() {
-        Database.domainVideoPlayer[selectedItemIndex].messageCard
-            .add(novaMensagem);
+
+      try {
+        // Envia a nova mensagem para o banco de dados
+        await MessageDao().inserirMensagem(novaMensagem);
+
+        // Limpa o campo de texto após o envio
         _messageController.clear();
-      });
+
+        // Atualiza a lista de mensagens após a inserção
+        setState(() {});
+      } catch (e) {
+        print("Erro ao inserir mensagem: $e");
+      }
     }
   }
 
@@ -130,6 +139,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         _controller.play();
         setState(() {});
       });
+    _messagesFuture = MessageDao().listarMensagem(widget.telaIdAtual);
   }
 
   @override
@@ -195,7 +205,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   return [
                                     PopupMenuItem<String>(
                                       value: 'compartilhar',
-                                      child: Text('compartilhar'),
+                                      child: Text('Compartilhar'),
                                     ),
                                     PopupMenuItem<String>(
                                       value: 'salvar',
@@ -491,123 +501,154 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           ),
                           Container(
                             height: MediaQuery.of(context).size.height / 2,
-                            child: ListView.builder(
-                              itemCount: Database.domainVideoPlayer.length,
-                              itemBuilder: (context, index) {
-                                final message = Database
-                                    .domainVideoPlayer[index].messageCard;
-                                return Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            SizedBox(
-                                              width: 40,
-                                              height: 40,
-                                              child: CircleAvatar(
-                                                radius: 20,
-                                                backgroundImage: NetworkImage(
-                                                    message[index].image),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  message[index].nome,
-                                                  style: TextStyle(
-                                                    decoration:
-                                                        TextDecoration.none,
-                                                    color: Colors.black,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
+                            child: FutureBuilder<List<MessageCardClass>>(
+                              future: _loadMessages(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                      child:
+                                          Text('Erro ao carregar mensagens'));
+                                } else if (!snapshot.hasData ||
+                                    snapshot.data!.isEmpty) {
+                                  return Center(
+                                      child:
+                                          Text('Nenhuma mensagem encontrada'));
+                                } else {
+                                  final messages = snapshot.data!;
+
+                                  // Inicializar a lista de favoritos com o tamanho correto
+                                  if (_isFavorite.isEmpty) {
+                                    _isFavorite =
+                                        List.filled(messages.length, false);
+                                  }
+
+                                  return ListView.builder(
+                                    itemCount: messages.length,
+                                    itemBuilder: (context, index) {
+                                      final message =
+                                          messages[index]; // Mensagem filtrada
+
+                                      return Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  SizedBox(
+                                                    width: 40,
+                                                    height: 40,
+                                                    child: CircleAvatar(
+                                                      radius: 20,
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                              message.image),
+                                                    ),
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  width: 16,
-                                                ),
-                                                Text(
-                                                  message[index].tempoMensagem,
-                                                  style: TextStyle(
-                                                    decoration:
-                                                        TextDecoration.none,
-                                                    color: Colors.black54,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
+                                                ],
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        message.nome,
+                                                        style: TextStyle(
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .none,
+                                                          color: Colors.black,
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 16),
+                                                      Text(
+                                                        message.tempoMensagem,
+                                                        style: TextStyle(
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .none,
+                                                          color: Colors.black54,
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 8,
-                                            ),
-                                            SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  1.7,
-                                              child: Text(
-                                                message[index].mensagem,
-                                                style: TextStyle(
-                                                  decoration:
-                                                      TextDecoration.none,
-                                                  color: Color.fromARGB(
-                                                      180, 0, 0, 0),
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
+                                                  SizedBox(height: 8),
+                                                  SizedBox(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width /
+                                                            1.7,
+                                                    child: Text(
+                                                      message.mensagem,
+                                                      style: TextStyle(
+                                                        decoration:
+                                                            TextDecoration.none,
+                                                        color: Color.fromARGB(
+                                                            180, 0, 0, 0),
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                setState(
-                                                  () {
-                                                    _isFavorite[index] =
-                                                        !_isFavorite[index];
-                                                  },
-                                                );
-                                              },
-                                              icon: Icon(
-                                                _isFavorite[index]
-                                                    ? Icons.favorite
-                                                    : Icons
-                                                        .favorite_border_outlined,
-                                                color: _isFavorite[index]
-                                                    ? Colors.red
-                                                    : Colors.grey,
-                                                size: 35,
+                                              Column(
+                                                children: [
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _isFavorite[index] =
+                                                            !_isFavorite[index];
+                                                      });
+                                                    },
+                                                    icon: Icon(
+                                                      _isFavorite[index]
+                                                          ? Icons.favorite
+                                                          : Icons
+                                                              .favorite_border_outlined,
+                                                      color: _isFavorite[index]
+                                                          ? Colors.red
+                                                          : Colors.grey,
+                                                      size: 35,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${message.views}",
+                                                    style: TextStyle(
+                                                      decoration:
+                                                          TextDecoration.none,
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            Text(
-                                              "${message[index].views}",
-                                              style: TextStyle(
-                                                decoration: TextDecoration.none,
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    TextButton(
-                                      onPressed: () {},
-                                      child: Text("Ver mais"),
-                                    ),
-                                  ],
-                                );
+                                            ],
+                                          ),
+                                          TextButton(
+                                            onPressed: () {},
+                                            child: Text("Ver mais"),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
                               },
                             ),
                           ),
