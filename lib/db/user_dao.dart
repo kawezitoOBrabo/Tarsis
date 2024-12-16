@@ -14,7 +14,6 @@ class UserDao {
     return result.isNotEmpty;
   }
 
-  // Método para salvar um novo usuário no banco de dados
   saveUser(User user) async {
     Database db = await DBHelper().initDB();
     await db.insert('USER', user.toJson());

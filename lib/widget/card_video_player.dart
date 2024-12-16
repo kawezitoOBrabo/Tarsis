@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:async';
 import 'package:Tarsis/db/message_dao.dart';
-import 'package:Tarsis/pages/recycle_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Tarsis/domain/domain_video_player.dart';
@@ -54,12 +53,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   String _myAppLink =
       "https://play.google.com/store/apps/details?id=com.example.myapp";
 
-  //Permissao para acessar o armazenamento
   Future<void> _requestPermission() async {
     await Permission.storage.request();
   }
 
-  //Salva a imagem depois de receber a permissao
   Future<void> saveImage(Uint8List image) async {
     final time = DateTime.now().toIso8601String().replaceAll(".", "-");
     final newNomeImagem = _nomeImagemSalva.text.trim();
@@ -86,7 +83,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
   }
 
-  // Carregar as mensagens
   Future<void> _loadMessages() async {
     List<MessageCardClass> mensagens =
         await MessageDao().listarMensagem(widget.telaIdAtual);
@@ -127,7 +123,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     Share.share(mensagem, subject: 'Look what I made!');
   }
 
-  //Atera a visibilidade do card
   void _messageCardVisibility() {
     setState(() {
       _isCardVisible = !_isCardVisible;
@@ -293,9 +288,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           Navigator.of(context)
                                               .pop(); // Fecha o diálogo
                                           ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                                  content: Text(
-                                                      'Imagem salva com sucesso!')));
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  'Imagem salva com sucesso!'),
+                                            ),
+                                          );
                                         },
                                         child: Text('Salvar'),
                                       ),
@@ -600,9 +598,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                   SizedBox(height: 8),
                                                   SizedBox(
                                                     width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width /
+                                                        MediaQuery.of(context).size.width /
                                                             1.7,
                                                     child: Text(
                                                       message.mensagem,
@@ -623,16 +619,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                 children: [
                                                   IconButton(
                                                     onPressed: () {
-                                                      setState(() {
-                                                        _isFavorite[index] =
-                                                            !_isFavorite[index];
-                                                      });
+                                                      setState(
+                                                        () {
+                                                          _isFavorite[index] = !_isFavorite[index];
+                                                        },
+                                                      );
                                                     },
                                                     icon: Icon(
                                                       _isFavorite[index]
                                                           ? Icons.favorite
-                                                          : Icons
-                                                              .favorite_border_outlined,
+                                                          : Icons.favorite_border_outlined,
                                                       color: _isFavorite[index]
                                                           ? Colors.red
                                                           : Colors.grey,
@@ -686,7 +682,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: Color(0xff27de2d)),
+                                              color: Color(0xff27de2d),
+                                            ),
                                           ),
                                         ),
                                       ),

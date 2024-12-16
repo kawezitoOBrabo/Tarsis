@@ -11,10 +11,9 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
-  // Controllers para os campos do formulário
-  TextEditingController usernameController = TextEditingController();  // Alterado de nomeController para usernameController
+  TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();  // Alterado de senhaController para passwordController
+  TextEditingController passwordController = TextEditingController();
   TextEditingController cpfController = TextEditingController();
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -96,7 +95,7 @@ class _CadastroPageState extends State<CadastroPage> {
                   const SizedBox(height: 16),
                   const Text(' Nome *', style: TextStyle(fontSize: 16)),
                   TextFormField(
-                    controller: usernameController,  // Alterado de nomeController para usernameController
+                    controller: usernameController,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Nome obrigatório.';
@@ -128,7 +127,7 @@ class _CadastroPageState extends State<CadastroPage> {
                   const SizedBox(height: 16),
                   const Text(' Senha *', style: TextStyle(fontSize: 16)),
                   TextFormField(
-                    controller: passwordController,  // Alterado de senhaController para passwordController
+                    controller: passwordController,
                     obscureText: true,
                     validator: (value) {
                       if (value!.length < 6) {
@@ -144,7 +143,7 @@ class _CadastroPageState extends State<CadastroPage> {
                   const SizedBox(height: 32),
                   ElevatedButton(
                     onPressed: () {
-                      onPressed(); // Chama a função para salvar o usuário
+                      onPressed();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 237, 245, 239),
@@ -162,23 +161,17 @@ class _CadastroPageState extends State<CadastroPage> {
     );
   }
 
-  // Função chamada no onPressed do botão de cadastro
   Future<void> onPressed() async {
-    // Validar o Form
     if (formKey.currentState!.validate()) {
-      // Obter os valores dos campos
-      String username = usernameController.text;  // Alterado para usernameController
+      String username = usernameController.text;
       String email = emailController.text;
-      String password = passwordController.text;  // Alterado para passwordController
+      String password = passwordController.text;
       String cpf = cpfController.text;
 
-      // Criar um objeto User com os dados inseridos
       User user = User(username, password, email, cpf);
 
-      // Salvar o usuário no banco de dados
       await UserDao().saveUser(user);
 
-      // Voltar para a tela anterior ou outra ação
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

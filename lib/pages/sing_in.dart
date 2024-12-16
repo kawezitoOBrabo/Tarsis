@@ -16,7 +16,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();  // Alterado para passwordController
+  TextEditingController passwordController = TextEditingController();
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  controller: passwordController,  // Alterado para passwordController
+                  controller: passwordController,
                   obscureText: true,
                   validator: (value) {
                     if (value!.length < 6) {
@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       String email = emailController.text;
-                      String password = passwordController.text;  // Alterado para password
+                      String password = passwordController.text;
 
                       if (email.contains('@') && password.length > 6) {
                         Navigator.pushReplacement(
@@ -204,9 +204,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> onPressed() async {
-    // Validar os campos de e-mail e senha
     if (formKey.currentState!.validate()) {
-      // Recuperar os dados dos TextFormFields
       String email = emailController.text;
       String password = passwordController.text;
       bool auth = await UserDao().autenticar(email, password);
@@ -214,7 +212,6 @@ class _LoginPageState extends State<LoginPage> {
       if (auth) {
         SharedPrefs().setUser(true);
 
-        // Navegar p/ HomePage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

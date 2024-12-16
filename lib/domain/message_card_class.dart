@@ -1,5 +1,5 @@
 class MessageCardClass {
-  int? id; // Altere para int? (nullable)
+  int? id;
   late int tela_id;
   late String image;
   late String nome;
@@ -8,7 +8,7 @@ class MessageCardClass {
   late int views;
 
   MessageCardClass({
-    this.id, // Agora o id pode ser passado ou ser nulo
+    this.id,
     required this.tela_id,
     required this.image,
     required this.nome,
@@ -29,7 +29,7 @@ class MessageCardClass {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id, // O id agora pode ser nulo
+      'id': id,
       'tela_id': tela_id,
       'imagem': image,
       'nomePerfil': nome,

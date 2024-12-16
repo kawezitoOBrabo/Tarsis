@@ -16,7 +16,6 @@ class PaginaDao {
       DomainVideoPlayer paginas = DomainVideoPlayer.fromJson(json);
       lista.add(paginas);
     }
-    print(result);
     return lista;
   }
 }

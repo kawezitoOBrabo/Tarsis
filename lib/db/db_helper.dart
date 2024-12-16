@@ -7,7 +7,6 @@ class DBHelper {
     String path = await getDatabasesPath();
     String dbPath = join(path, "recycle.db");
 
-    // Abre o banco de dados e cria a tabela caso não exista.
     Database database = await openDatabase(
       dbPath,
       version: 1,
@@ -19,7 +18,6 @@ class DBHelper {
   }
 
   Future<void> onCreate(Database db, int version) async {
-    // Criação da tabela PAGINA
     await db.execute('''
       CREATE TABLE PAGINAS (
         id INTEGER PRIMARY KEY,
@@ -31,7 +29,6 @@ class DBHelper {
       );
     ''');
 
-    // Inserção inicial na tabela PAGINA
     await db.execute('''
       INSERT INTO PAGINAS (
         id, video, perfilImagem, nomePerfil, descricao, musica
@@ -43,7 +40,6 @@ class DBHelper {
         (5, 'https://videos.pexels.com/video-files/6395999/6395999-hd_1080_1920_25fps.mp4', 'https://images.pexels.com/users/avatars/2297095/pavel-danilyuk-690.jpeg?auto=compress&fit=crop&h=40&w=40&dpr=1', 'Rafael Santana', 'Mostrando meu setup gamer atualizado.', 'Techno Waves - EDM Mix');
     ''');
 
-    // Criação da tabela MENSAGEM
     await db.execute('''
       CREATE TABLE MENSAGEM (
         id INTEGER PRIMARY KEY,
@@ -56,7 +52,6 @@ class DBHelper {
       );
     ''');
 
-    // Inserção inicial na tabela MENSAGEM
     await db.execute('''
       INSERT INTO MENSAGEM (
         id, tela_id, imagem, nomePerfil, tempoMensagem, mensagem, views
@@ -68,7 +63,6 @@ class DBHelper {
         (5, 5, 'https://images.pexels.com/users/avatars/5432/rob-40.jpeg', 'Rob', '6 horas', 'Fiquei muito satisfeito, ótimo!', 2900);
       ''');
 
-    // Criação da tabela usuário
     await db.execute('''
       CREATE TABLE USER (
         username varchar(100) PRIMARY KEY,
@@ -78,10 +72,8 @@ class DBHelper {
       );
     ''');
 
-    // Inserir um usuário
     await db.execute('''
-        INSERT INTO USER (
-        username, password, email, cpf) 
+        INSERT INTO USER (username, password, email, cpf) 
         VALUES ('joao@gmail.com', '123456', 'joao@gmail.com','123.456.789-00');
     ''');
   }

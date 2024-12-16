@@ -5,12 +5,11 @@ import 'package:sqflite/sqflite.dart';
 class MessageDao {
   Future<List<MessageCardClass>> listarMensagem(int telaId) async {
     Database db = await DBHelper().initDB();
-    String sql = 'SELECT * FROM MENSAGEM WHERE tela_id = ?'; // Filtra por tela_id
-    var result = await db.rawQuery(sql, [telaId]); // Passa o tela_id como parâmetro
+    String sql = 'SELECT * FROM MENSAGEM WHERE tela_id = ?';
+    var result = await db.rawQuery(sql, [telaId]);
 
     List<MessageCardClass> lista = [];
 
-    // Verifica se não há resultados
     if (result.isEmpty) {
       print("Nenhuma mensagem encontrada para tela_id $telaId");
       return lista;
@@ -24,14 +23,13 @@ class MessageDao {
     return lista;
   }
 
-  // Método para inserir a nova mensagem no banco de dados
   Future<void> inserirMensagem(MessageCardClass mensagem) async {
     Database db = await DBHelper().initDB();
 
     await db.insert(
       'MENSAGEM',
       mensagem.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace, // Caso a mensagem já exista, substitui
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 }
