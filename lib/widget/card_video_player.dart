@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:async';
 import 'package:Tarsis/db/message_dao.dart';
+import 'package:Tarsis/pages/recycle_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:Tarsis/domain/domain_video_player.dart';
@@ -64,14 +65,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     final newNomeImagem = _nomeImagemSalva.text.trim();
     if (_nomeCaminhoImagemSalva.text.isNotEmpty) {
       final path =
-      join(_nomeCaminhoImagemSalva.text, "$newNomeImagem-$time.png");
+          join(_nomeCaminhoImagemSalva.text, "$newNomeImagem-$time.png");
 
       final file = File(path);
       await file.writeAsBytes(image);
 
       print('Imagem salva em: $path');
     } else {
-      // Caso nenhum caminho tenha sido selecionado, pode exibir uma mensagem de erro.
       print('Nenhum caminho selecionado para salvar a imagem.');
     }
   }
@@ -88,33 +88,29 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   // Carregar as mensagens
   Future<void> _loadMessages() async {
-    List<MessageCardClass> mensagens = await MessageDao().listarMensagem(widget.telaIdAtual);
+    List<MessageCardClass> mensagens =
+        await MessageDao().listarMensagem(widget.telaIdAtual);
     setState(() {
-      // Atualizar a lista de mensagens e o estado dos favoritos
       _messagesFuture = Future.value(mensagens);
-      _isFavorite = List.filled(mensagens.length, false);    });
+      _isFavorite = List.filled(mensagens.length, false);
+    });
   }
 
   void _sendMessage() async {
     if (_messageController.text.isNotEmpty) {
-      // Crie a nova mensagem
       MessageCardClass novaMensagem = MessageCardClass(
         tela_id: widget.telaIdAtual,
-        image: 'https://images.pexels.com/users/avatars/1437723/cottonbro-studio-531.jpeg',
-        nome: 'Usuário',
-        tempoMensagem: 'Agora',
+        image:
+            'https://images.pexels.com/users/avatars/1437723/cottonbro-studio-531.jpeg', //Não dinamizado
+        nome: 'Usuário', //Não dinamizado
+        tempoMensagem: 'Agora', //Não dinamizado
         mensagem: _messageController.text,
-        views: 0,
+        views: 0, //Não dinamizado
       );
 
       try {
-        // Envia a nova mensagem para o banco de dados
         await MessageDao().inserirMensagem(novaMensagem);
-
-        // Limpa o campo de texto após o envio
         _messageController.clear();
-
-        // Aguarde o carregamento das mensagens de forma mais confiável
         Future.delayed(Duration(milliseconds: 1500), () async {
           await _loadMessages();
         });
@@ -207,10 +203,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   color: Colors.white,
                                   size: 32,
                                 ),
-                                offset: Offset(
-                                  0,
-                                  50,
-                                ),
+                                offset: Offset(0, 50),
                                 itemBuilder: (BuildContext context) {
                                   return [
                                     PopupMenuItem<String>(
@@ -225,6 +218,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       value: 'reportar',
                                       child: Text('Reportar'),
                                     ),
+                                    PopupMenuItem<String>(
+                                      value: 'voltar',
+                                      child: Text('Voltar'),
+                                    ),
                                   ];
                                 },
                                 onSelected: (String value) {
@@ -237,6 +234,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       break;
                                     case 'reportar':
                                       print('Reportar selecionado');
+                                      break;
+                                    case 'voltar':
+                                      print('Voltar selecionado');
+                                      Navigator.pop(context);
+                                      break;
+                                    default:
+                                      print("Nenhum selecionado");
                                       break;
                                   }
                                 },
@@ -530,7 +534,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 } else {
                                   final messages = snapshot.data!;
 
-                                  // Inicializar a lista de favoritos com o tamanho correto
                                   if (_isFavorite.isEmpty) {
                                     _isFavorite =
                                         List.filled(messages.length, false);
@@ -539,9 +542,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   return ListView.builder(
                                     itemCount: messages.length,
                                     itemBuilder: (context, index) {
-                                      final message =
-                                          messages[index]; // Mensagem filtrada
-
+                                      final message = messages[index];
                                       return Column(
                                         children: [
                                           Row(
@@ -557,7 +558,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                       radius: 20,
                                                       backgroundImage:
                                                           NetworkImage(
-                                                              message.image),
+                                                        message.image,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],

@@ -1,3 +1,5 @@
+import 'package:Tarsis/pages/sing_in.dart';
+import 'package:Tarsis/pages/sing_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -116,7 +118,12 @@ class _HomePageState extends State<HomePage> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CadastroPage(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.zero,
@@ -149,7 +156,12 @@ class _HomePageState extends State<HomePage> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginPage(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.zero,

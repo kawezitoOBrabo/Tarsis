@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Tarsis/widget/card_video_player.dart';
 import 'package:Tarsis/domain/domain_video_player.dart';
-import 'package:Tarsis/db/pagina_dao.dart';
+import 'package:Tarsis/db/page_dao.dart';
 
 class PageViewScreen extends StatefulWidget {
   const PageViewScreen({super.key});

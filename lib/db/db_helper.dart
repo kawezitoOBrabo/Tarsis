@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 class DBHelper {
   Future<Database> initDB() async {
     String path = await getDatabasesPath();
-    String dbPath = join(path, "pagina.db");
+    String dbPath = join(path, "recycle.db");
 
     // Abre o banco de dados e cria a tabela caso não exista.
     Database database = await openDatabase(
@@ -67,6 +67,22 @@ class DBHelper {
         (4, 4, 'https://images.pexels.com/users/avatars/7890/lucas-40.jpeg', 'Lucas', '1 mês', 'Nunca vi uma explicação tão completa.', 2900),        
         (5, 5, 'https://images.pexels.com/users/avatars/5432/rob-40.jpeg', 'Rob', '6 horas', 'Fiquei muito satisfeito, ótimo!', 2900);
       ''');
+
+    // Criação da tabela usuário
+    await db.execute('''
+      CREATE TABLE USER (
+        username varchar(100) PRIMARY KEY,
+        password varchar(100),
+        email varchar(100),
+        cpf varchar(20)
+      );
+    ''');
+
+    // Inserir um usuário
+    await db.execute('''
+        INSERT INTO USER (
+        username, password, email, cpf) 
+        VALUES ('joao@gmail.com', '123456', 'joao@gmail.com','123.456.789-00');
+    ''');
   }
 }
-
