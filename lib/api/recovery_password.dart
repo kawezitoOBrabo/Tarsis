@@ -1,41 +1,29 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RecoveryPassword {
-  Future<void> recoveryPassword(String userIdOrEmail) async {
-    final url = Uri.parse(
-        'http://localhost:8051/api/framework/v1/users/$userIdOrEmail/recoveryPassword');
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-    final response = await http.post(url);
-
-    if (response.statusCode == 200) {
+  Future<void> recoveryPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
       print('Email enviado com sucesso!');
-    } else {
-      print('Erro ao enviar o email: ${response.body}');
+    } on FirebaseAuthException catch (e) {
+      print('Erro ao enviar o email: ${e.message}');
+    } catch (e) {
+      print('Erro desconhecido: $e');
     }
   }
 
-  Future<void> changePasswordWithToken(
-      String userIdOrEmail, String token, String newPassword) async {
-    final url = Uri.parse(
-        'http://localhost:8051/api/framework/v1/users/$userIdOrEmail/changePasswordWithToken');
+  Future<void> changePasswordWithToken(String token, String newPassword) async {
+    try {
+      UserCredential userCredential = await _auth.signInWithCustomToken(token);
 
-    final payload = json.encode({
-      "lastPassword": token,
-      "newPassword": newPassword,
-      "confirmationPassword": newPassword,
-    });
-
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: payload,
-    );
-
-    if (response.statusCode == 200) {
+      await userCredential.user?.updatePassword(newPassword);
       print('Senha alterada com sucesso!');
-    } else {
-      print('Erro ao alterar a senha: ${response.body}');
+    } on FirebaseAuthException catch (e) {
+      print('Erro ao alterar a senha: ${e.message}');
+    } catch (e) {
+      print('Erro desconhecido: $e');
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:Tarsis/api/recovery_password.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class SenhaPage extends StatefulWidget {
   const SenhaPage({super.key});
@@ -10,13 +11,12 @@ class SenhaPage extends StatefulWidget {
 
 class _SenhaPageState extends State<SenhaPage> {
   final TextEditingController _emailController = TextEditingController();
-  final RecoveryPassword _recoveryPassword = RecoveryPassword();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void _enviarEmail() async {
     String email = _emailController.text.trim();
 
     if (email.isEmpty) {
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, insira um e-mail válido.')),
       );
@@ -24,10 +24,14 @@ class _SenhaPageState extends State<SenhaPage> {
     }
 
     try {
-      await _recoveryPassword.recoveryPassword(email);
+      await _auth.sendPasswordResetEmail(email: email);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('E-mail de recuperação enviado!')),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: ${e.message}')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
